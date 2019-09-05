@@ -1,0 +1,25 @@
+.chat {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-head {
+    background: #fafafa;
+    padding:16px;
+}
+
+.chat-list {
+    flex: 1;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.chat-input {
+    padding:16px;
+    background: #fafafa;
+}
+
+.chat-name {
+    width:160px;
+}
