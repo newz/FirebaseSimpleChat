@@ -7,9 +7,3 @@
     color:#999;
     margin-left:8px;
 }
-
-.ChatRow-Content {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
