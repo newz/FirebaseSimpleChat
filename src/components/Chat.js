@@ -115,6 +115,9 @@ class Chat extends React.Component {
     }
     gotoBottom(e) {
         const node = this.chatZone.current;
+        if(!node) {
+            return;
+        }
         node.scrollTop = node.scrollHeight;
     }
     // https://reactjs.org/docs/forms.html

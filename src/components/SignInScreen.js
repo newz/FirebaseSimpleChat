@@ -8,19 +8,27 @@ const firebase = Firebase.firebase;
 
 class SignInScreen extends React.Component {
     // Configure FirebaseUI.
-    uiConfig = {
-        // Popup signin flow rather than redirect flow.
-        signInFlow: 'popup',
-        // We will display Google and Facebook as auth providers.
-        signInOptions: [
-            firebase.auth.FacebookAuthProvider.PROVIDER_ID
-        ],
-        //signInSuccessUrl: '/',
-        callbacks: {
-            // Avoid redirects after sign-in.
-            signInSuccessWithAuthResult: () => false
-        }
-    };
+    constructor(props) {
+        super(props);
+        const providers = process.env.REACT_APP_FIREBASE_PROVIDER || 'EmailAuthProvider';
+        const signInOptions = [];
+        providers.split(',').forEach(provider => {
+            if(firebase.auth[provider]) {
+                signInOptions.push(firebase.auth[provider].PROVIDER_ID);
+            }
+        })
+        this.uiConfig = {
+            // Popup signin flow rather than redirect flow.
+            signInFlow: 'popup',
+            // We will display Google and Facebook as auth providers.
+            signInOptions,
+            //signInSuccessUrl: '/',
+            callbacks: {
+                // Avoid redirects after sign-in.
+                signInSuccessWithAuthResult: () => false
+            }
+        };
+    }
 
     render() {
         return (
