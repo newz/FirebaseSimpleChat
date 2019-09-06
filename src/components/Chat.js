@@ -1,5 +1,6 @@
 import React from 'react';
 import ChatRow from './ChatRow.js';
+import History from '../History.js';
 import './Chat.css';
 
 // https://medium.com/javascript-in-plain-english/i-created-the-exact-same-app-in-react-and-vue-here-are-the-differences-e9a1ae8077fd
@@ -13,7 +14,7 @@ class Chat extends React.Component {
             isLastedPage: true,
             decryptFailed: 0,
             encrypter: null,
-            name: props.name,
+            name: localStorage.getItem('__cname') || props.name,
             isScrolled: false,
             content: ''
         };
@@ -24,18 +25,23 @@ class Chat extends React.Component {
         this.chatZone = React.createRef();
 
         this.loadOlderChat = this.loadOlderChat.bind(this);
+        this.loadNewerChat = this.loadNewerChat.bind(this);
         this.loadCurrentChat = this.loadCurrentChat.bind(this);
 
         this.ChatDecrypt = props.ChatDecrypt;
+        this.History = new History(() => {
+            this.fetch();
+        });
     }
     componentDidMount() {
         this.ChatDecrypt.setChat(this);
-        this.ChatDecrypt.fetch({});
+        this.fetch();
     }
     addRowShow (newRow) {
-        if(!this._lastedKey) {
-            this._lastedKey = newRow.key;
+        if(!this._oldestKey) {
+            this._oldestKey = newRow.key;
         }
+        this._newestKey = newRow.key;
         this.setState((state, props) => {
             const newState = {
                 rows: [...state.rows, newRow]
@@ -45,28 +51,57 @@ class Chat extends React.Component {
             }
             return newState;
         });
-        if(!this.state.isScrolled) {
-            this.gotoBottom();
+        if(newRow.decrypted && !this.isSentJoinMessage) {
+            this.isSentJoinMessage = true;
+            this.ChatDecrypt.addRow({ 
+                name: this.state.name, 
+                content: "*I've joined a chat*",
+                time: Math.floor(new Date().getTime() / 1000)
+            }); 
         }
+        setTimeout(() => {
+            if(!this.state.isScrolled) {
+                this.gotoBottom();
+            }
+        }, 100);
+    }
+    fetch () {
+        this._oldestKey = null;
+        this._newestKey = null;
+        const endAt = this.History.getQuery('endAt');
+        const startAt = this.History.getQuery('startAt');
+        if(endAt || startAt) {
+            this.setState({
+                isLastedPage: endAt === startAt,
+                rows: []
+            });
+        } else {
+            this.setState({
+                rows: []
+            });
+        }
+        this.ChatDecrypt.fetch({ endAt, startAt });
     }
     loadOlderChat () {
-        this.setState({
-            isLastedPage: false,
-            rows: []
-        });
-        let endAt = this._lastedKey;
-        this._lastedKey = null;
-        this.ChatDecrypt.fetch({
+        if(!this._oldestKey) {
+            return;
+        }
+        let endAt = this._oldestKey;
+        this.History.push({
             endAt
+        })
+    }
+    loadNewerChat () {
+        if(!this._newestKey) {
+            return;
+        }
+        let startAt = this._newestKey;
+        this.History.push({
+            startAt
         });
     }
     loadCurrentChat () {
-        this.setState({
-            isLastedPage: true,
-            rows: []
-        });
-        this._lastedKey = null;
-        this.ChatDecrypt.fetch({});
+        this.History.push({})
     }
     handleScroll (e) {
         const t = e.target;
@@ -86,20 +121,29 @@ class Chat extends React.Component {
     handleSubmit(e) {
         e.preventDefault();
         const { name, content } = this.state;
+        localStorage.setItem('__cname', name);
         this.ChatDecrypt.addRow({ 
             name, 
             content,
             time: Math.floor(new Date().getTime() / 1000)
-         });
-        this.setState({
-            'content': ''
         });
-        this.gotoBottom();
+        this.setState({
+            content: '',
+            isScrolled: false
+        });
     }
     handleInputChange(event) {
         const target = event.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
+        if(name === 'name') {
+            if(value.length > 20) {
+                value = value.length.substr(0, 20);
+            }
+            if(value.length < 1) {
+                value = 'Unnamed';
+            }
+        }
         this.setState({
             [name]: value
         });
@@ -113,6 +157,9 @@ class Chat extends React.Component {
                             <input type="button" className="button" onClick={this.loadOlderChat} value="Older" />
                         </p>
                         {!this.state.isLastedPage && 
+                        <p className="control"><input className="button" type="button" onClick={this.loadNewerChat} value="Newer" /></p>
+                        }
+                        {!this.state.isLastedPage && 
                         <p className="control"><input className="button" type="button" onClick={this.loadCurrentChat} value="Newest" /></p>
                         }
                     </div>
@@ -121,7 +168,7 @@ class Chat extends React.Component {
                     {this.state.rows.map((r) => {
                         return <ChatRow
                             key={r.key}
-                            id={r.id}
+                            id={r.key}
                             content={r.content}
                             time={r.time}
                             name={r.name}

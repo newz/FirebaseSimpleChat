@@ -1,5 +1,4 @@
-
-const sjcl = window.sjcl;
+import sjcl from 'sjcl';
 
 const config = {
     ks: 256,

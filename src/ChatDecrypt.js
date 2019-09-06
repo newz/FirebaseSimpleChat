@@ -24,10 +24,11 @@ class ChatDecrypt {
             this.fetch({});
         }
     }
-    fetch ({ endAt }) {
+    fetch ({ endAt, startAt }) {
         console.log('fetch', endAt);
         this.DB.listLastedRows({
             endAt,
+            startAt,
             onAdd: (data) => {
                 const val = data.val();
                 const row = {

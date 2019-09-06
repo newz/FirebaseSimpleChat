@@ -13,6 +13,7 @@ class ChatRow extends React.Component {
                     <span>{this.props.name}</span>
                     <i>{this.props.uid}</i>
                     <i>{this.time(this.props.time)}</i>
+                    <i>#{this.props.id}</i>
                 </div>
                 <div className="ChatRow-Content">
                     <ReactMarkdown source={this.props.content} />
