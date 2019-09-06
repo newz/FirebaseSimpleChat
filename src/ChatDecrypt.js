@@ -66,6 +66,12 @@ class ChatDecrypt {
         })
     }
     addRow (row) {
+        if(row.name === '') {
+            row.name = 'Unnamed';
+        }
+        if(row.name.length > 20) {
+            row.name = row.name.substr(0, 20);
+        }
         const data = this.encrypter.encrypt(row);
         const r = this.DB.addNewRow({
             data

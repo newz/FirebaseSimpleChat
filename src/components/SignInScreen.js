@@ -10,10 +10,13 @@ class SignInScreen extends React.Component {
     // Configure FirebaseUI.
     constructor(props) {
         super(props);
-        const providers = process.env.REACT_APP_FIREBASE_PROVIDER || 'EmailAuthProvider';
+        let allowAnonymous = false;
+        const providers = process.env.REACT_APP_FIREBASE_PROVIDER || 'Anonymous';
         const signInOptions = [];
         providers.split(',').forEach(provider => {
-            if(firebase.auth[provider]) {
+            if(provider === 'Anonymous') {
+                allowAnonymous = true;
+            } else if(firebase.auth[provider]) {
                 signInOptions.push(firebase.auth[provider].PROVIDER_ID);
             }
         })
@@ -28,12 +31,25 @@ class SignInScreen extends React.Component {
                 signInSuccessWithAuthResult: () => false
             }
         };
+        this.state = {
+            allowAnonymous
+        }
+
+        this.signinAnonymously = this.signinAnonymously.bind(this);
+    }
+
+    signinAnonymously() {
+        firebase.auth().signInAnonymously().catch((error) => {
+            alert(`Sign-in Error\n${error.message}`);
+        });
     }
 
     render() {
         return (
             <div>
                 <p style={{textAlign: 'center'}}>Please sign-in</p>
+                {this.state.allowAnonymous && 
+                <p style={{textAlign: 'center'}}><a href="#" onClick={this.signinAnonymously}>Sign-in Anonymously</a></p>}
                 <StyledFirebaseAuth uiConfig={this.uiConfig} firebaseAuth={firebase.auth()} />
             </div>
         );

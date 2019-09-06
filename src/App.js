@@ -11,13 +11,13 @@ import Firebase from './Firebase';
 const firebase = Firebase.firebase;
 
 class App extends React.Component {
-    state = {
-        isSignedIn: false, // Local signed-in state.
-        encrypter: null,
-        name: ''
-    };
     constructor(props) {
         super(props);
+        this.state = {
+            isSignedIn: false, // Local signed-in state.
+            encrypter: null,
+            name: ''
+        };
         this.onPasswordChanged = this.onPasswordChanged.bind(this);
         this.ChatDecrypt = new ChatDecrypt();
     }

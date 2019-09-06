@@ -51,14 +51,14 @@ class Chat extends React.Component {
             }
             return newState;
         });
-        if(newRow.decrypted && !this.isSentJoinMessage) {
+        /* if(newRow.decrypted && !this.isSentJoinMessage) {
             this.isSentJoinMessage = true;
             this.ChatDecrypt.addRow({ 
                 name: this.state.name, 
                 content: "*I've joined a chat*",
                 time: Math.floor(new Date().getTime() / 1000)
             }); 
-        }
+        } */
         setTimeout(() => {
             if(!this.state.isScrolled) {
                 this.gotoBottom();
@@ -139,14 +139,6 @@ class Chat extends React.Component {
         const target = event.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
-        if(name === 'name') {
-            if(value.length > 20) {
-                value = value.length.substr(0, 20);
-            }
-            if(value.length < 1) {
-                value = 'Unnamed';
-            }
-        }
         this.setState({
             [name]: value
         });
@@ -193,6 +185,7 @@ class Chat extends React.Component {
                     <div className="field is-grouped">
                         <p className="control">
                             <input type="text" className="input chat-name" name="name"
+                                maxLength="20"
                                 value={this.state.name}
                                 placeholder="Name"
                                 onChange={this.handleInputChange} />
