@@ -15,6 +15,6 @@ REACT_APP_FIREBASE_DATABASEURL=https://xx.firebaseio.com // xx is likey <firebas
 REACT_APP_FIREBASE_AUTHDOMAIN=xx.firebaseapp.com // xx is likey <firebase-project-id>
 REACT_APP_FIREBASE_PROVIDER=FacebookAuthProvider,GoogleAuthProvider,PhoneAuthProvider,EmailAuthProvider
 ```
-4. Set-up Firebase authentication by go to https://console.firebase.google.com/project/<firebase-project-id>/authentication/providers , providers login button can be edit
+4. Set-up Firebase authentication by go to https://console.firebase.google.com/project/firebase-project-id/authentication/providers
 4. Run `npm start` and go to `http://localhost:3000` if your browser don't open up automatically.
 5. Set your password and salt, click update, send your first message and your set up is now completed!
