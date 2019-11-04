@@ -1,11 +1,10 @@
 ## Firebase Simple Chat
 
-My React learning project, an encrypted chat hosted on firebase.
-This script can be deployed to any static hosting like Netlify and stored data encrypted on Firebase.
+My React learning project, an chat deployed to static hosting like Netlify and stored data encrypted on Firebase.
 
-\* This project had many limitation due to limit of Firebase realtime database.
+**This project is me testing React only. Do use this project to store any sensitive data**
 
-**Even though data on this project is "encrypted" do not store any sensitive data in this project**
+[Demo](https://chat.necz.net) Password: 111222
 
 ### Create Firebase project
 
@@ -19,16 +18,24 @@ This script can be deployed to any static hosting like Netlify and stored data e
     ".write": false,
     "rows": {
       "$id": {
-          ".write": "auth !== null && ((!data.exists() && newData.child('uid').val() == auth.uid ) || (data.child('uid').val() == auth.uid && newData.child('uid').val() == auth.uid))"
+          ".write": "auth !== null 
+              && (
+                    (!data.exists() && newData.child('uid').val() == auth.uid ) 
+                    || (data.exists() 
+                        && data.child('uid').val() == auth.uid 
+                        && (newData.child('uid').val() == auth.uid || newData.child('uid').val() == null)
+                    )
+                    || (auth.uid === 'YourUserId')
+              )"
       }
     }
   }
 }
 ```
-4. Set-up authentication by go to `Authentication > Sign-in method` and add your domain to `Authorized domains`
+4. Set-up authentication by go to `Authentication > Sign-in method` select any authentication you want to use. and don't forget to add your domain in `Authorized domains`
 
 
-### To install this project
+### Install this project on your machine
 
 1. Clone this project. `git clone https://github.com/newz/FirebaseSimpleChat.git`
 2. Set-up environment variable, you can use .env file for example create .env on root of the project.
@@ -37,9 +44,10 @@ REACT_APP_FIREBASE_APIKEY=xxx // Get this from Project settings > general
 REACT_APP_FIREBASE_DATABASEURL=https://xx.firebaseio.com // xx is likey <firebase-project-id>
 REACT_APP_FIREBASE_AUTHDOMAIN=xx.firebaseapp.com // xx is likey <firebase-project-id>
 REACT_APP_FIREBASE_PROVIDER=Anonymous,FacebookAuthProvider,PhoneAuthProvider
+REACT_APP_SALT=XYZABC // optional salt
 ```
 3. Run `npm start` and go to `http://localhost:3000` if your browser don't open up automatically.
-4. Set your password and salt, click update, send your first message and your set up is now completed!
+4. Set your password (and salt if you didn't set in env), click update, send your first message then done!
 
 
 ### Allow only you to access

@@ -29,6 +29,9 @@ class ChatDecrypt {
         this.DB.listLastedRows({
             endAt,
             startAt,
+            onRemove: (data) => {
+                this.Chat.removeRowByKey(data.key)
+            },
             onAdd: (data) => {
                 const val = data.val();
                 const row = {
@@ -65,8 +68,19 @@ class ChatDecrypt {
             }
         })
     }
+    removeChat (key) {
+        this.DB.deleteRow({
+            rowId: key
+        })
+        .then(function() {
+            console.log(`Remove #${key} succeeded.`)
+        })
+        .catch(function(error) {
+            alert(`Can't remove this message. ${error}`)
+        });
+    }
     addRow (row) {
-        if(row.name === '') {
+        if(row.name === '' || row.name === null) {
             row.name = 'Unnamed';
         }
         if(row.name.length > 20) {

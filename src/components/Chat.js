@@ -37,6 +37,13 @@ class Chat extends React.Component {
         this.ChatDecrypt.setChat(this);
         this.fetch();
     }
+    removeRowByKey(key) {
+        const rows = this.state.rows;
+        const removed = rows.filter(row => row.key !== key);
+        this.setState({
+            rows: removed
+        });
+    }
     addRowShow (newRow) {
         if(!this._oldestKey) {
             this._oldestKey = newRow.key;
@@ -120,11 +127,13 @@ class Chat extends React.Component {
         }
         node.scrollTop = node.scrollHeight;
     }
+    removeChat(key) {
+        this.ChatDecrypt.removeChat(key);
+    }
     // https://reactjs.org/docs/forms.html
     handleSubmit(e) {
         e.preventDefault();
         const { name, content } = this.state;
-        localStorage.setItem('__cname', name);
         this.ChatDecrypt.addRow({ 
             name, 
             content,
@@ -139,6 +148,9 @@ class Chat extends React.Component {
         const target = event.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
+        if(name === 'name') {
+            localStorage.setItem('__cname', value);
+        }
         this.setState({
             [name]: value
         });
@@ -162,6 +174,7 @@ class Chat extends React.Component {
                 <div ref={this.chatZone} className="chat-list" onScroll={this.handleScroll}>
                     {this.state.rows.map((r) => {
                         return <ChatRow
+                            Chat={this}
                             key={r.key}
                             id={r.key}
                             content={r.content}

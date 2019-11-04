@@ -60,6 +60,12 @@ class DB {
         ref.push(r);
         return r;
     }
+    deleteRow ({
+        rowId
+    }) {
+        const ref = this.db.ref(`rows/${rowId}`);
+        return ref.remove();
+    }
 }
 
 export default DB;

@@ -7,10 +7,12 @@ class Chat extends React.Component {
         this.state = {
             password: '',
             salt: '',
+            lockedSalt: !!process.env.REACT_APP_SALT,
             encrypter: null
         };
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
+        this.deleteEncrypter = this.deleteEncrypter.bind(this);
         setTimeout(() => {
             this.updateEncrypter();
         }, 100);
@@ -26,6 +28,11 @@ class Chat extends React.Component {
         e.preventDefault();
         this.updateEncrypter();
     }
+    deleteEncrypter(e) {
+        e.preventDefault();
+        localStorage.removeItem('__cachedpw');
+        this.updateEncrypter();
+    }
     handleInputChange(event) {
         const target = event.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
@@ -35,9 +42,12 @@ class Chat extends React.Component {
         });
     }
     updateEncrypter() {
-        const { password, salt } = this.state;
+        let { password, salt } = this.state;
         let cachedPassword;
-        if (password || salt) {
+        if(process.env.REACT_APP_SALT) {
+            salt = process.env.REACT_APP_SALT;
+        }
+        if (password) {
             if (password && salt) {
                 cachedPassword = Encrypter.createCachedPassword({ password, salt })
                 localStorage.setItem('__cachedpw', JSON.stringify(cachedPassword));
@@ -60,6 +70,13 @@ class Chat extends React.Component {
                 salt: '',
                 encrypter
             })
+        } else {
+            this.props.onPasswordChanged();
+            this.setState({
+                password: '',
+                salt: '',
+                encrypter: null
+            })
         }
     }
     render() {
@@ -79,20 +96,24 @@ class Chat extends React.Component {
                         <label className="label">Salt</label>
                         <div className="control">
                             <input className="input" type="text" name="salt"
+                                disabled={this.state.lockedSalt}
                                 value={this.state.salt}
                                 onChange={this.handleInputChange} />
                         </div>
                     </div>
 
-                    <div className="field">
+                    {this.state.encrypter
+                    ? <span></span>
+                    : <div className="field">
                         <div className="control">
                             <input className="button is-info" type="submit" value="Update" />
                         </div>
-                    </div>
+                    </div>}
+                    
                 </form>
                 {this.state.encrypter
-                    ? <span>Encrypter Set!</span>
-                    : <span>Please set encrypter</span>}
+                    ? <span>Encrypter Set! <a href="#" onClick={this.deleteEncrypter}>Remove Encrypter</a></span>
+                    : <span>Please set an encrypter</span>}
             </div>
         );
     }
